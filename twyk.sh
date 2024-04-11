@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 ENV_FILE="$HOME/.twyk.env"
 
