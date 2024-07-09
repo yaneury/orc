@@ -29,8 +29,20 @@ if ! command -v heif-convert &> /dev/null; then
 fi
 
 usage() {
-    echo "Usage: $0 {sleep|wake|sync|update|debug}"
+    echo "Usage: $0 {connect|reboot|shutdown|sleep|wake|sync|update|debug}"
     exit 1
+}
+
+function connect() {
+  ssh "$TWYK_USER@$TWYK_HOST"
+}
+
+function reboot() {
+  invoke "sudo reboot"
+}
+
+function shutdown() {
+  invoke "shutdown now"
 }
 
 function wake() {
