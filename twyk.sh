@@ -101,6 +101,15 @@ case $1 in
     "wake")
         wake
         ;;
+    "connect")
+        connect
+        ;;
+    "reboot")
+        reboot
+        ;;
+    "shutdown")
+        shutdown
+        ;;
     "sync")
         sync
         ;;
