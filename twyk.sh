@@ -60,11 +60,11 @@ function sync() {
     for filename in *; do
         new_filename=$(echo "$filename" | tr '[:upper:]' '[:lower:]')
         if [ "$filename" != "$new_filename" ]; then
-            mv -f "$filename" "$new_filename"
+            mv -f "$filename" "$new_filename" || return 1
             echo "Renamed: $filename -> $new_filename"
         fi
+        heif-convert "$new_filename" "${new_filename%.*}.jpeg"
     done
-    heif-convert *.heic -f jpg
     rm *.heic
     rsync -avz --exclude='*.heic' $TWYK_STAGING $TWYK_USER@$TWYK_HOST:$TWYK_DESTINATION
 }
