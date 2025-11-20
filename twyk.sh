@@ -55,9 +55,15 @@ function sleep() {
 }
 
 function sync() {
+    # Navigate to staging directory
     cd $TWYK_STAGING
-    rsync -avz --exclude='.DS_Store' $TWYK_SOURCE $TWYK_STAGING
-    for filename in *; do
+
+    # Recursively find and copy all image files from source to staging (flattens directory structure)
+    find "$TWYK_SOURCE" -type f \( -iname "*.heic" -o -iname "*.jpg" -o -iname "*.jpeg" \) -exec cp {} "$TWYK_STAGING/" \;
+
+    # Process HEIC files: rename to lowercase and convert to JPEG
+    for filename in *.heic *.HEIC; do
+        [ -e "$filename" ] || continue
         new_filename=$(echo "$filename" | tr '[:upper:]' '[:lower:]')
         if [ "$filename" != "$new_filename" ]; then
             mv -f "$filename" "$new_filename" || return 1
@@ -65,8 +71,12 @@ function sync() {
         fi
         heif-convert "$new_filename" "${new_filename%.*}.jpeg"
     done
-    rm *.heic
-    rsync -avz --exclude='*.heic' $TWYK_STAGING $TWYK_USER@$TWYK_HOST:$TWYK_DESTINATION
+
+    # Clean up original HEIC files after conversion
+    rm -f *.heic
+
+    # Transfer all files (JPEGs only) to remote host, excluding HEIC and DS_Store files
+    rsync -avz --exclude='*.heic' --exclude='.DS_Store' $TWYK_STAGING $TWYK_USER@$TWYK_HOST:$TWYK_DESTINATION
 }
 
 function build_and_deploy() {
